@@ -1,8 +1,10 @@
 
-This repository contains the official implementation of the following paper. It is open-sourced for reproduction and research purposes, and may be polished further in the future.### Training HyperNeRV
+This repository contains the official implementation of the following paper. It is open-sourced for reproduction and research purposes, and may be polished further in the future.
 
-**Fast Encoding and Decoding for Implicit Video Representation (ECCV 2024)**
-<!-- (https://arxiv.org/abs/2409.19429) -->
+**Fast Encoding and Decoding for Implicit Video Representation (ECCV 2024)**  
+[Paper](https://arxiv.org/abs/2409.19429)
+
+
 
 [Hao Chen](https://haochen-rye.github.io), 
 Saining Xie,
