@@ -1,8 +1,7 @@
 
-This repository contains the official implementation for the following paper:
-### Training HyperNeRV
+This repository contains the official implementation of the following paper. It is open-sourced for reproduction and research purposes, and may be polished further in the future.### Training HyperNeRV
 
-[**Fast Encoding and Decoding for Implicit Video Representation**]
+**Fast Encoding and Decoding for Implicit Video Representation (ECCV 2024)**
 <!-- (https://arxiv.org/abs/2409.19429) -->
 
 [Hao Chen](https://haochen-rye.github.io), 
@@ -10,13 +9,27 @@ Saining Xie,
 Ser-Nam Lim,
 [Abhinav Shrivastava](http://www.cs.umd.edu/~abhinav)
 
-In submission
-
+<!-- Framework Section -->
+<h3>Framework</h3>
 <p float="left">
-<img src="https://i.imgur.com/wJ3QsQM.png" height="200">
-<img src="https://i.imgur.com/qFWSTYu.jpg" height="200">
-<img src="https://i.imgur.com/tFbN3os.png" height="200">
+  <img src="figures/overall-results.png" height="200">
 </p>
+
+<!-- Fast Encoding Section -->
+<h3>Fast Encoding</h3>
+<p float="left">
+  <img src="figures/framework.png" height="200">
+  <img src="figures/encode-fig.png" height="200">
+  <img src="figures/encoding-table.png" height="200">
+</p>
+
+<!-- Fast Decoding Section -->
+<h3>Fast Decoding</h3>
+<p float="left">
+  <img src="figures/decode-method.png" height="200">
+  <img src="figures/decode-speed.png" height="200">
+</p>
+
 
 <!-- Project page: https://yinboc.github.io/trans-inr/. -->
 
@@ -86,9 +99,19 @@ python run_trainer.py --cfg cfgs/nerv_enc.yaml -w \
 
 Baseline command for training NeRV from scratch.
 ```
-python nerv_baseline/train_hypoconv.py -e 100 \
+python projects/nerv_baseline/train_hypoconv.py -e 100 \
     --vid_path '/fs/vulcan-datasets/kinetics/val_256_new/cracking_neck/-SdZ6USVLi4.mp4' \
     --vid k400_01 --crop_size 128 --hid_dim 32 --strds 8 4 2 2 --ks 1 3 \
     --pe_dim 16 --pe_sigma 1024 --act gelu --out_bias tanh -b 2 --lr 0.001 \
     --eval_freq 50  --frames 8 --outf 302_e100_N8 
 ```
+
+<p>If you find our work useful, please consider citing our paper:</p>
+
+<pre><code>@article{chen2024fastnerv,
+  title={Fast Encoding and Decoding for Implicit Video Representation},
+  author={Chen, Hao and Xie, Saining and Lim, Ser-Nam and Shrivastava, Abhinav},
+  journal={ECCV},
+  year={2024}
+}
+</code></pre>
