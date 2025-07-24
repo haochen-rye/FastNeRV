@@ -1,0 +1,73 @@
+trainer: enc_trainer
+zero_center: False
+
+train_dataset:
+  name: video_dataset
+  args: {root_path: data/dataset_meta/meta, split: train, 
+    frame_num: $frame_num$, csv_file: $csv_file$, t_duration: $t_duration$,
+    cls_vid_num: '400_50', crop_size: $input_size$, resize: False, rand_flip: False,
+    decode_type: 'torchvision', lmdb_root: '', }
+  loader:
+    batch_size: $batch_size$
+    num_workers: $num_workers$
+
+test_dataset:
+  name: video_dataset
+  args: {root_path: data/dataset_meta/meta, frame_num: $frame_num$, t_duration: $t_duration$,
+    cls_vid_num: '100_5', crop_size: $input_size$, resize: True, }
+  csv_paths: {test: ucf_101_short128.csv}
+  loader:
+    batch_size: $batch_size$
+    num_workers: $num_workers$
+
+model:
+  name: nerv_enc
+  args:
+    tokenizer:
+      name: vid_tokenizer
+      args: {input_size: $input_size$, patch_hw: 16, patch_t: 3, 
+        frame_num: $frame_num$, learn_pe: True}
+    hyponet:
+      name: nerv_model
+      args: {frame_num: $frame_num$, in_dim: 1, out_dim: 3, strds: '4_4_4_4',  
+        ks: '1_3', hid_dim: 64, act: 'gelu', out_bias: 'tanh', out_range: 'no',
+        pos_embed: 'inr_1024', pe_dim: 16, learn_pe: False}
+    nerv_tokens: {
+      token_nums: '4_64_16_0', # token_num for 'w0_w1_w2_w3'
+      token_dims: '144_288_288_288',   # token_dim1 for 'w0_w1_w2_w3'
+      token_init_std: 0.02,
+      z_type: 'nerv',
+      z_dim: 320,
+      repeat_dim: -2,
+      z_norm: 'no',
+      z_norm_first: False,
+    }
+    transformer_encoder: {
+      name: 'ViT-B',
+      proj_drop: 0.,
+      attn_drop: 0.,
+      mlp_drop: 0.,
+      }
+    kl_layer: {
+      kl_weight: 0., # loss_weight for kl_layer
+      deterministic: True,
+      avg_kl: False
+    }
+optimizer:
+  name: adamw
+  args: {lr: 1.e-4, weight_decay: 0.0}
+  lr_type: step
+  loss_weights: '1_0_0'   # loss_weights for L2_L1_SSIM
+  epoch_cycles: 1
+  cycle_decay: 1.0
+  full_cosine: False
+max_epoch: 300
+eval_epoch: 50
+vis_epoch: 50
+save_epoch: 200
+vis_n: 16
+dump_pred: 'no'
+dump_video: 'no'
+dump_vid_grid: 'no'
+eval_model: 'no'
+resume_ckt: 'no'

@@ -1,0 +1,103 @@
+trainer: enc_trainer
+zero_center: False
+use_amp: True
+
+train_dataset:
+  name: video_dataset
+  args: {root_path: data/dataset_meta/meta, split: train, 
+    frame_num: $frame_num$, csv_file: $csv_file$, t_duration: $t_duration$,
+    cls_vid_num: '400_50', crop_size: $input_size$, resize: False, rand_flip: False, 
+    decode_type: 'torchvision', lmdb_root: '', }
+  loader:
+    batch_size: $batch_size$
+    num_workers: $num_workers$
+
+test_dataset:
+  name: video_dataset
+  args: {root_path: data/dataset_meta/meta, frame_num: $frame_num$, t_duration: $t_duration$,
+    cls_vid_num: '100_2', crop_size: $input_size$, resize: True, }
+  csv_paths: {test: ucf101-test_short128.csv}
+  loader:
+    batch_size: $batch_size$
+    num_workers: $num_workers$
+
+model:
+  name: tnerv_enc
+  args:
+    tokenizer:
+      name: vid_tokenizer
+      args: {input_size: $input_size$, patch_hw: 16, patch_t: 1, 
+        frame_num: $frame_num$, learn_pe: True}
+    encoder: {
+      name: 'ViT-B',
+      proj_drop: 0.,
+      attn_drop: 0.,
+      mlp_drop: 0.,
+      }
+    decoder: {
+      name: 'ViT-B',
+      proj_drop: 0.,
+      attn_drop: 0.,
+      mlp_drop: 0.,
+      learn_p_pe: True,
+      learn_z_pe: True,
+      token_init_std: 0.02,
+      z_tokens: '32_128_0',
+      z_bottleneck: False,
+      z_dim: 512,
+      z_norm: 'bn_bn',
+      z_norm_first: False,
+      d_tokens: 0,
+      use_v_tokens: '1_4_4',
+      v_dim: 4,
+      imgwise_decode: True,
+      expand_decoder: True,
+      sequential_decode: True,
+      cumsum_z: True,
+      final_ch: 4,
+      final_ks: 3,
+      out_bias: 0.5,
+      out_range: 'no',
+      }      
+    kl_layer: {
+      deterministic: True,
+      kl_weight: 0., # loss_weight for kl_layer
+      avg_kl: False,
+    }
+    vq_layer: {
+      use_vq: False,
+      codebook_size: 8192,
+      vq_weight: 0., # loss_weight for commitment loss
+      commit_loss: 1.,
+      codebook_loss: 1.,
+      using_znorm: False,
+      unuse_token_thres: 0.,    # 0. means not re-init unused tokens in codebook
+      ema: False,
+      ema_decay: 0.99,
+      ema_type: 'v',
+    }    
+optimizer:
+  name: adamw
+  args: {lr: 1.e-4, weight_decay: 0.0}
+  lr_type: step
+  loss_weights: '1_0_0'   # loss_weights for L2_L1_SSIM
+  epoch_cycles: 1
+  cycle_decay: 1.0
+  full_cosine: False
+max_epoch: 300
+eval_epoch: 50
+vis_epoch: 50
+save_epoch: 200
+log_every_n: 10
+vis_n: 16
+dump_pred: 'no'
+dump_video: 'no'
+dump_vid_grid: 'no'
+eval_model: 'no'
+resume_ckt: 'no'
+
+eval_cfgs:
+  eval_batchsize: 64
+  eval_n: 1024
+  vis_n: 16
+  fvd_real_stats_path: 'utils/fvd/fvd_stats_precomputed/fvd_stats_ucf101_train_f16_t1_200_8.pkl'
